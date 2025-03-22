@@ -4,8 +4,10 @@ globs:
 alwaysApply: true
 ---
 
-# Your rule content
+# My ruless
 
 - The client project is located at `./tic-tac-toe-client`, all edits to client code should start at this directory, not at the root
 - All `*.component.ts` should not contain any template defined in the file, instead it should aways refer to a corresponding `*.component.html` file
 - All html code should be written in `.html` files, not inside `.component.ts` files
+
+- The server project is located at `./tic-tac-toe-server`, all edits to server code should start at this directory, not at the root
