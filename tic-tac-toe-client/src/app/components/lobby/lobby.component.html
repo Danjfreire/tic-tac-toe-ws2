@@ -8,7 +8,25 @@
             Players Online: {{ playerCount }}
           </p>
         </div>
-        <p class="text-gray-600">Welcome to the lobby! More features coming soon...</p>
+
+        @if (!isMatchmaking) {
+          <button
+            (click)="findMatch()"
+            class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+            Find Match
+          </button>
+        } @else {
+          <div class="space-y-4">
+            <div class="animate-pulse text-lg font-medium text-blue-600">
+              Searching for opponent... {{ formatTime(searchTime) }}
+            </div>
+            <button
+              (click)="cancelMatchmaking()"
+              class="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+              Cancel
+            </button>
+          </div>
+        }
       </div>
     </div>
   </div>

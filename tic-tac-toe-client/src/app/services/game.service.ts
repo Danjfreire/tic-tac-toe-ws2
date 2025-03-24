@@ -17,22 +17,40 @@ export interface JoinedMessage {
   player: Player;
 }
 
+export interface FindMatchMessage {
+  type: 'find_match';
+  playerId: string;
+}
+
+export interface CancelMatchmakingMessage {
+  type: 'cancel_matchmaking';
+  playerId: string;
+}
+
+export interface MatchFoundMessage {
+  type: 'match_found';
+  matchId: string;
+  opponent: Player;
+  symbol: 'X' | 'O';
+}
+
 export interface PlayerCountMessage {
   type: 'player_count';
   count: number;
 }
 
-export type ServerMessage = JoinedMessage | PlayerCountMessage;
-export type ClientMessage = JoinMessage;
+export type ServerMessage = JoinedMessage | PlayerCountMessage | MatchFoundMessage;
+export type ClientMessage = JoinMessage | FindMatchMessage | CancelMatchmakingMessage;
 export type Message = ClientMessage | ServerMessage;
 
 @Injectable({
   providedIn: 'root'
 })
 export class GameService {
-  private socket$: WebSocketSubject<Message>;
+  public socket$: WebSocketSubject<Message>;
   public player$ = new BehaviorSubject<Player | null>(null);
   public playerCount$ = new BehaviorSubject<number>(0);
+  public isMatchmaking$ = new BehaviorSubject<boolean>(false);
 
   constructor() {
     this.socket$ = webSocket('ws://localhost:3000');
@@ -67,5 +85,31 @@ export class GameService {
 
   getPlayerCount(): Observable<number> {
     return this.playerCount$.asObservable();
+  }
+
+  findMatch() {
+    const player = this.player$.value;
+    if (!player) return;
+
+    const message: FindMatchMessage = {
+      type: 'find_match',
+      playerId: player.id
+    };
+
+    this.socket$.next(message);
+    this.isMatchmaking$.next(true);
+  }
+
+  cancelMatchmaking() {
+    const player = this.player$.value;
+    if (!player) return;
+
+    const message: CancelMatchmakingMessage = {
+      type: 'cancel_matchmaking',
+      playerId: player.id
+    };
+
+    this.socket$.next(message);
+    this.isMatchmaking$.next(false);
   }
 }
