@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GameService } from '../../services/game.service';
-import { Router } from '@angular/router';
+import { GameStateService } from '../../services/game-state.service';
 import { Subscription, interval } from 'rxjs';
 
 @Component({
@@ -18,19 +18,18 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   constructor(
     private gameService: GameService,
-    private router: Router
+    private gameState: GameStateService
   ) { }
 
   ngOnInit() {
     this.subscriptions.push(
-      this.gameService.getPlayerCount().subscribe(count => {
+      this.gameState.getPlayerCount().subscribe(count => {
         this.playerCount = count;
       }),
 
-      this.gameService.isMatchmaking$.subscribe(isSearching => {
+      this.gameState.getMatchmaking().subscribe(isSearching => {
         this.isMatchmaking = isSearching;
         if (isSearching) {
-          // Start the timer
           this.searchTime = 0;
           this.subscriptions.push(
             interval(1000).subscribe(() => {
@@ -38,21 +37,15 @@ export class LobbyComponent implements OnInit, OnDestroy {
             })
           );
         }
-      }),
-
-      this.gameService.socket$.subscribe(message => {
-        if (message.type === 'match_found') {
-          this.router.navigate(['/game']);
-        }
       })
     );
   }
 
-  findMatch() {
+  findMatch(): void {
     this.gameService.findMatch();
   }
 
-  cancelMatchmaking() {
+  cancelMatchmaking(): void {
     this.gameService.cancelMatchmaking();
   }
 

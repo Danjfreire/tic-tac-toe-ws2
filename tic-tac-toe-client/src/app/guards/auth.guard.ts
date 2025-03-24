@@ -1,13 +1,13 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { GameService } from '../services/game.service';
+import { GameStateService } from '../services/game-state.service';
 import { map } from 'rxjs';
 
 export const authGuard: CanActivateFn = () => {
-    const gameService = inject(GameService);
+    const gameState = inject(GameStateService);
     const router = inject(Router);
 
-    return gameService.getPlayer().pipe(
+    return gameState.getPlayer().pipe(
         map(player => {
             if (player) {
                 return true;

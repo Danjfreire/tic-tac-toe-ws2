@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import { GameService, Message } from '../../services/game.service';
-import { Router } from '@angular/router';
+import { GameService } from '../../services/game.service';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -11,27 +10,11 @@ import { FormsModule } from '@angular/forms';
 export class JoinComponent {
   username: string = '';
 
-  constructor(
-    private gameService: GameService,
-    private router: Router
-  ) { }
+  constructor(private gameService: GameService) { }
 
-  onJoin() {
+  onJoin(): void {
     if (this.username.trim()) {
-      this.gameService.connect(this.username)
-        .subscribe({
-          next: (response: Message) => {
-            if (response.type === 'joined') {
-              // Store the player in the service
-              this.gameService.player$.next(response.player);
-              // Navigate to game page after successful join
-              this.router.navigate(['/lobby']);
-            }
-          },
-          error: (error) => {
-            console.error('Connection error:', error);
-          }
-        });
+      this.gameService.connect(this.username);
     }
   }
 }
