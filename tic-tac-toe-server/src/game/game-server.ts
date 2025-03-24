@@ -30,6 +30,19 @@ export class GameServer {
         });
     }
 
+    private broadcastPlayerCount() {
+        const count = this.players.size;
+        const message = JSON.stringify({
+            type: 'player_count',
+            count
+        });
+
+        // Broadcast to all connected players
+        this.players.forEach(player => {
+            player.socket.send(message);
+        });
+    }
+
     private handleJoin(socket: WebSocket, username: string) {
         const playerId = uuid();
         const player: Player = {
@@ -48,12 +61,17 @@ export class GameServer {
                 username
             }
         }));
+
+        // Broadcast updated player count
+        this.broadcastPlayerCount();
     }
 
     private handleDisconnect(socket: WebSocket) {
         for (const [id, player] of this.players.entries()) {
             if (player.socket === socket) {
                 this.players.delete(id);
+                // Broadcast updated player count after disconnect
+                this.broadcastPlayerCount();
                 break;
             }
         }

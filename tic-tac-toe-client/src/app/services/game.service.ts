@@ -17,7 +17,12 @@ export interface JoinedMessage {
   player: Player;
 }
 
-export type ServerMessage = JoinedMessage;
+export interface PlayerCountMessage {
+  type: 'player_count';
+  count: number;
+}
+
+export type ServerMessage = JoinedMessage | PlayerCountMessage;
 export type ClientMessage = JoinMessage;
 export type Message = ClientMessage | ServerMessage;
 
@@ -27,9 +32,19 @@ export type Message = ClientMessage | ServerMessage;
 export class GameService {
   private socket$: WebSocketSubject<Message>;
   public player$ = new BehaviorSubject<Player | null>(null);
+  public playerCount$ = new BehaviorSubject<number>(0);
 
   constructor() {
     this.socket$ = webSocket('ws://localhost:3000');
+
+    // Subscribe to messages to handle player count updates
+    this.socket$.subscribe({
+      next: (message: Message) => {
+        if (message.type === 'player_count') {
+          this.playerCount$.next(message.count);
+        }
+      }
+    });
   }
 
   connect(username: string): Observable<Message> {
@@ -48,5 +63,9 @@ export class GameService {
 
   getPlayer(): Observable<Player | null> {
     return this.player$.asObservable();
+  }
+
+  getPlayerCount(): Observable<number> {
+    return this.playerCount$.asObservable();
   }
 }

@@ -25,7 +25,7 @@ export class JoinComponent {
               // Store the player in the service
               this.gameService.player$.next(response.player);
               // Navigate to game page after successful join
-              this.router.navigate(['/game']);
+              this.router.navigate(['/lobby']);
             }
           },
           error: (error) => {
